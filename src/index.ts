@@ -12,21 +12,33 @@ import { IndexedDbManager } from './indexedDB';
 
 const cacheInstance = Cache.getInstance();
 
+let transformersModule: any;
+let pipeline: any;
+let pipe: any;
+let currentModel: string;
+
+export const initializeModel = async (model: string = "Xenova/gte-small"): Promise<void> => {
+  if (model !== currentModel) {
+    transformersModule = await import("@xenova/transformers");
+    pipeline = transformersModule.pipeline;
+    pipe = await pipeline("feature-extraction", model);
+    currentModel = model;
+  }
+}
 
 export const getEmbedding = async (
   text: string,
   precision: number = 7,
   options = { pooling: "mean", normalize: false },
-  model = "Xenova/gte-small",
+  model: string = "Xenova/gte-small"
 ): Promise<number[]> => {
+  if (model !== currentModel) {
+    await initializeModel(model);
+  }
   const cachedEmbedding = cacheInstance.get(text);
   if (cachedEmbedding) {
     return Promise.resolve(cachedEmbedding);
   }
-
-  const transformersModule = await import("@xenova/transformers");
-  const { pipeline } = transformersModule;
-  const pipe = await pipeline("feature-extraction", model);
   const output = await pipe(text, options);
   const roundedOutput = Array.from(output.data as number[]).map(
     (value: number) => parseFloat(value.toFixed(precision))
