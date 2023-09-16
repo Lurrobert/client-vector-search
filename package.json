@@ -1,5 +1,5 @@
 {
-  "name": "client-vector-search",
+  "name": "@robertoooooo/client-vector-search",
   "version": "0.0.8",
   "description": "A client side vector search library",
   "main": "dist/index.js",
@@ -37,5 +37,8 @@
     "@xenova/transformers": "^2.5.2",
     "lru-cache": "^10.0.1",
     "fake-indexeddb": "^4.0.2"
+  },
+  "directories": {
+    "test": "test"
   }
 }
